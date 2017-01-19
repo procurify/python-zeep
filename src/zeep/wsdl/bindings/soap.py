@@ -68,6 +68,13 @@ class SoapBinding(Binding):
         envelope = serialized.content
         http_headers = serialized.headers
 
+        # Manually remove tokenPassport that's being incorrectly added by zeep
+        from lxml import etree
+        token_passport = envelope.xpath('//x:tokenPassport',
+            namespaces={'x':'urn:messages_2016_2.platform.webservices.netsuite.com'})
+        if token_passport:
+            token_passport[0].getparent().remove(token_passport[0])
+
         # Apply ws-addressing
         if client:
             if not options:
